@@ -38,6 +38,18 @@ def gameover(screen: pg.Surface) -> None:
     pg.display.update()
     time.sleep(5)
 
+def unit_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
+    bb_accs = [a for a in range(1,11)]
+    bb_imgs = []
+    for r in range(1,11):
+        bb_img = pg.Surface((20*r, 20*r))
+        pg.draw.circle(bb_img, (255, 0, 0), (10*r, 10*r), 10*r)
+        bb_img.set_colorkey((0, 0, 0))
+        bb_imgs.append(bb_img)
+    return bb_accs, bb_imgs
+
+#def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]
+
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
@@ -55,6 +67,7 @@ def main():
 
     clock = pg.time.Clock()
     tmr = 0
+    bb_accs, bb_imgs = unit_bb_imgs()
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
@@ -65,6 +78,12 @@ def main():
         screen.blit(bg_img, [0, 0]) 
         key_lst = pg.key.get_pressed()
         sum_mv = [0, 0]
+        avx = vx*bb_accs[min(tmr//500, 9)]
+        avy = vy*bb_accs[min(tmr//500, 9)]
+        bb_img = bb_imgs[min(tmr//500, 9)]
+        bb_rct.move_ip(avx, avy)
+        bb_rct.width = bb_img.get_rect().width
+        bb_rct.height = bb_img.get_rect().height
         # if key_lst[pg.K_UP]:
         #     sum_mv[0] -= 5
         # if key_lst[pg.K_DOWN]:
@@ -81,7 +100,6 @@ def main():
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
         screen.blit(kk_img, kk_rct)
-        bb_rct.move_ip(vx, vy)
         yoko, tate = check_bound(bb_rct)
         if not yoko:
             vx *= -1
