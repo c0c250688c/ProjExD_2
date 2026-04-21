@@ -7,7 +7,7 @@ import time
 
 WIDTH, HEIGHT = 1100, 650
 DELTA = {
-    pg.K_UP: (0, -5),
+    pg.K_UP: (0, -5),#どの移動キーを押したかの保存
     pg.K_DOWN: (0, 5),
     pg.K_LEFT: (-5, 0),
     pg.K_RIGHT: (5, 0),
@@ -18,28 +18,28 @@ def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     # 引数：こうかとんRectまたは爆弾Rect
     # 戻り値：横方向、縦方向判定結果（True：画面内、False：画面外）
     yoko, tate = True, True
-    if rct.left < 0 or WIDTH < rct.right:
+    if rct.left < 0 or WIDTH < rct.right:#横方向に飛び出していないか
         yoko = False
-    if rct.top < 0 or HEIGHT < rct.bottom:
+    if rct.top < 0 or HEIGHT < rct.bottom:#縦方向に飛び出していないか
         tate = False
     return yoko, tate
 
 def gameover(screen: pg.Surface) -> None:
     go_img = pg.image.load("fig/8.png") 
-    go_bg = pg.Surface((2000,2000))
+    go_bg = pg.Surface((2000,2000))#GAME OVERの背景
     pg.draw.rect(go_bg, (0, 0, 0), pg.Rect(0, 0, 400, 200))
-    go_bg.set_alpha(128)
-    go_fo = pg.font.Font(None, 80)
-    txt = go_fo.render("GAME OVER", True, (255, 255, 255))
-    go_bg.blit(txt, [390, 280])
-    go_bg.blit(go_img,(740,270))
-    go_bg.blit(go_img,(340,270))
-    screen.blit(go_bg, (0,0))
+    go_bg.set_alpha(128)#背景の透明度
+    go_fo = pg.font.Font(None, 80)#GAME OVERの文字の大きさ
+    txt = go_fo.render("GAME OVER", True, (255, 255, 255))#色や文字の指定
+    go_bg.blit(txt, [390, 280])#GAME OVERの位置
+    go_bg.blit(go_img,(740,270))#こうかとんの位置
+    go_bg.blit(go_img,(340,270))#こうかとんの位置
+    screen.blit(go_bg, (0,0))#背景の位置
     pg.display.update()
-    time.sleep(5)
+    time.sleep(5)#GAME OVERの画面で何秒とまるか
 
 def unit_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
-    bb_accs = [a for a in range(1,11)]
+    bb_accs = [a for a in range(1,11)]#時間
     bb_imgs = []
     for r in range(1,11):
         bb_img = pg.Surface((20*r, 20*r))
@@ -48,7 +48,13 @@ def unit_bb_imgs() -> tuple[list[pg.Surface], list[int]]:
         bb_imgs.append(bb_img)
     return bb_accs, bb_imgs
 
-#def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]
+# def get_kk_imgs() -> dict[tuple[int, int], pg.Surface]:　演習3の途中
+#     kk_dict = {
+#         ( 0, 0): rotozoom()
+#         ( 5, 0): rotozoom()
+#         ( 5, -5): rotozoom()
+#         ( 0, -5): rotozoom()
+#     }
 
 def main():
     pg.display.set_caption("逃げろ！こうかとん")
@@ -72,7 +78,7 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
-        if kk_rct.colliderect(bb_rct):
+        if kk_rct.colliderect(bb_rct):#こうかとんと爆弾が重なったら
             gameover(screen)
             return
         screen.blit(bg_img, [0, 0]) 
@@ -102,9 +108,9 @@ def main():
         screen.blit(kk_img, kk_rct)
         yoko, tate = check_bound(bb_rct)
         if not yoko:
-            vx *= -1
+            vx *= -1#逆方向にして飛び出さないようにする
         if not tate:
-            vy *= -1
+            vy *= -1#逆方向にして飛び出さないようにする
         screen.blit(bb_img, bb_rct)
         pg.display.update()
         tmr += 1
